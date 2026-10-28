@@ -22,6 +22,7 @@ jobs:
         run: |
           cd app
           bun add @tanstack/react-start@latest @tanstack/react-router@latest @tanstack/router-cli@latest
+          sed -i 's/error: Error; reset: () => void/error: unknown; reset: () => void/' src/routes/__root.tsx
           bun run build
       - name: Commit security update
         run: |
