@@ -168,7 +168,7 @@ jobs:
               '@import "./components/prompt-box/prompt-box.css";',
               '@import "./components/icon-tile/icon-tile.css";',
           ]:
-              css_text = css_text.replace(stale_import + "\\n", "")
+              css_text = css_text.replace(stale_import + "\n", "")
           css_path.write_text(css_text)
 
           security = root / "src/lib/security-headers.server.ts"
