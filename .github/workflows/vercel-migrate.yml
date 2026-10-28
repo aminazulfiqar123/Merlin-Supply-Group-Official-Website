@@ -1,0 +1,224 @@
+name: Remove platform dependencies and prepare Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Prepare independent Vercel source' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Remove platform-only scaffolding and rewrite app configuration
+        shell: bash
+        run: |
+          python3 <<'PY'
+          import json, pathlib, shutil
+          root = pathlib.Path("app")
+          package_path = root / "package.json"
+          package = json.loads(package_path.read_text())
+          package.pop("workspaces", None)
+          package["scripts"].pop("dev:design", None)
+          package["scripts"]["build"] = "tsr generate && tsc --noEmit && vite build"
+          package["scripts"].pop("check:ui", None)
+          package["scripts"].pop("check:adapted", None)
+          package["devDependencies"].pop("@cloudflare/workers-types", None)
+          for name in list(package["dependencies"]):
+              if name.startswith("@higgsfield/"):
+                  package["dependencies"].pop(name)
+          package_path.write_text(json.dumps(package, indent=2) + "\n")
+
+          (root / "vite.config.ts").write_text("""import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+          import { nitro } from "nitro/vite";
+          import tailwindcss from "@tailwindcss/vite";
+          import react from "@vitejs/plugin-react";
+          import svgr from "vite-plugin-svgr";
+          import { defineConfig } from "vite";
+
+          export default defineConfig({
+            plugins: [
+              tanstackStart(),
+              nitro(),
+              react(),
+              tailwindcss(),
+              svgr({
+                svgrOptions: {
+                  icon: true,
+                  svgProps: { fill: "currentColor" },
+                  svgoConfig: {
+                    plugins: [{ name: "preset-default", params: { overrides: { removeViewBox: false } } }],
+                  },
+                },
+              }),
+            ],
+          });
+          """)
+
+          (root / "src/routes/__root.tsx").write_text("""import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+          import {
+            Outlet,
+            Link,
+            createRootRouteWithContext,
+            HeadContent,
+            Scripts,
+          } from "@tanstack/react-router";
+          import type { ReactNode } from "react";
+          import appCss from "../styles.css?url";
+          import appMetaJson from "../app-meta.json";
+
+          const DEFAULT_TITLE = "Merlin Supply Group LLC | Wholesale Distribution";
+          const DEFAULT_DESCRIPTION = "Wholesale sourcing, supplier relationships, and distribution coordination for U.S. business buyers.";
+          type AppMeta = {
+            og_title?: string | null;
+            og_description?: string | null;
+            og_image_url?: string | null;
+            favicon_url?: string | null;
+          };
+          const appMeta = appMetaJson as AppMeta;
+
+          export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+            head: () => {
+              const title = appMeta.og_title ?? DEFAULT_TITLE;
+              const description = appMeta.og_description ?? DEFAULT_DESCRIPTION;
+              const image = appMeta.og_image_url ?? undefined;
+              return {
+                meta: [
+                  { charSet: "utf-8" },
+                  { name: "viewport", content: "width=device-width, initial-scale=1" },
+                  { title },
+                  { name: "description", content: description },
+                  { name: "author", content: "Merlin Supply Group LLC" },
+                  { property: "og:title", content: title },
+                  { property: "og:description", content: description },
+                  { property: "og:type", content: "website" },
+                  ...(image ? [{ property: "og:image", content: image }] : []),
+                  { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+                  ...(image ? [{ name: "twitter:image", content: image }] : []),
+                ],
+                links: [
+                  { rel: "stylesheet", href: appCss },
+                  ...(appMeta.favicon_url ? [{ rel: "icon", href: appMeta.favicon_url }] : []),
+                ],
+              };
+            },
+            shellComponent: RootShell,
+            component: RootComponent,
+            notFoundComponent: NotFoundComponent,
+            errorComponent: ErrorComponent,
+          });
+
+          function RootShell({ children }: { children: ReactNode }) {
+            return (
+              <html lang="en">
+                <head><HeadContent /></head>
+                <body>{children}<Scripts /></body>
+              </html>
+            );
+          }
+
+          function RootComponent() {
+            const { queryClient } = Route.useRouteContext();
+            return <QueryClientProvider client={queryClient}><Outlet /></QueryClientProvider>;
+          }
+
+          function NotFoundComponent() {
+            return (
+              <main className="container" style={{ minHeight: "50vh", paddingBlock: "5rem", textAlign: "center" }}>
+                <p className="eyebrow">404</p>
+                <h1>Page not found</h1>
+                <p>The page you’re looking for doesn’t exist or has been moved.</p>
+                <Link to="/" className="nav-cta">Return home</Link>
+              </main>
+            );
+          }
+
+          function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+            console.error(error);
+            return (
+              <main className="container" style={{ minHeight: "50vh", paddingBlock: "5rem", textAlign: "center" }}>
+                <p className="eyebrow">Something went wrong</p>
+                <h1>This page didn’t load</h1>
+                <p>Please try again or return to the home page.</p>
+                <button className="nav-cta" onClick={reset}>Try again</button>{" "}
+                <a className="nav-cta" href="/">Return home</a>
+              </main>
+            );
+          }
+          """)
+
+          security = root / "src/lib/security-headers.server.ts"
+          if security.exists():
+              text = security.read_text().replace(
+                  '"frame-src \'self\' https://auth.higgsfield.app https://auth.higgsfield-dev.app; " +',
+                  '"frame-src \'self\'; " +'
+              )
+              security.write_text(text)
+
+          # Keep only code needed by the company website and its routes.
+          keep = {"routes", "components", "data", "styles.css", "svg.d.ts", "app-meta.json", "start.ts"}
+          src = root / "src"
+          for child in list(src.iterdir()):
+              if child.name not in keep:
+                  if child.is_dir():
+                      shutil.rmtree(child)
+                  else:
+                      child.unlink()
+          components = src / "components"
+          for child in list(components.iterdir()):
+              if child.name != "site":
+                  if child.is_dir():
+                      shutil.rmtree(child)
+                  else:
+                      child.unlink()
+          # Remove unused workspace packages and the old Workers configuration.
+          packages = root / "packages"
+          if packages.exists():
+              shutil.rmtree(packages)
+          for name in ["wrangler.jsonc", "app.manifest.json", "cloudflare-workers.d.ts"]:
+              p = root / name
+              if p.exists():
+                  p.unlink()
+
+          tsconfig = json.loads((root / "tsconfig.json").read_text())
+          tsconfig["include"] = ["src/routes/**/*.ts", "src/routes/**/*.tsx", "src/components/site/**/*.tsx", "src/data/**/*.json", "src/start.ts", "vite.config.ts"]
+          tsconfig["compilerOptions"].pop("types", None)
+          tsconfig["compilerOptions"].pop("paths", None)
+          (root / "tsconfig.json").write_text(json.dumps(tsconfig, indent=2) + "\n")
+
+          (root / "WEBSITE-PACKAGE-README.md").write_text("""# Merlin Supply Group LLC website
+
+          This repository contains the editable source for the Merlin Supply Group website.
+
+          ## Run locally
+          Install Node.js 22+ and Bun. From the app directory run bun install, then bun run dev to develop locally and bun run build to check and build for production.
+
+          ## Deploy on Vercel
+          Connect this GitHub repository in Vercel and set the Root Directory to app. Use bun install for installation and bun run build for the build command. Select the TanStack Start framework preset and Node.js 22.
+
+          ## Domain and services
+          Add the domain in Vercel after the deployment is verified, then follow Vercel's DNS instructions at the domain registrar. Website imagery is served from public assets or third-party image URLs. Contact forms use Web3Forms; replace the key in the form component with your own provider key if required. Keep secret keys out of Git.
+          """)
+          PY
+      - name: Install dependencies and build
+        run: |
+          cd app
+          bun install
+          bun run build
+      - name: Commit independent source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- app
+          if ! git diff --cached --quiet; then
+            git commit -m 'Remove Higgsfield dependencies and prepare Vercel deployment'
+            git push
+          fi
