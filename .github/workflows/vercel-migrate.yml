@@ -179,7 +179,13 @@ jobs:
                       shutil.rmtree(child)
                   else:
                       child.unlink()
-          # Remove unused workspace packages and the old Workers configuration.
+          # Remove unused workspace packages, generated app route, and old Workers config.
+          app_route = root / "src/routes/app.tsx"
+          if app_route.exists():
+              app_route.unlink()
+          start_entry = root / "src/start.ts"
+          if start_entry.exists():
+              start_entry.unlink()
           packages = root / "packages"
           if packages.exists():
               shutil.rmtree(packages)
@@ -189,7 +195,7 @@ jobs:
                   p.unlink()
 
           (root / "tsconfig.json").write_text("""{
-            "include": ["src/routes/**/*.ts", "src/routes/**/*.tsx", "src/components/site/**/*.tsx", "src/data/**/*.json", "src/start.ts", "vite.config.ts"],
+            "include": ["src/routes/**/*.ts", "src/routes/**/*.tsx", "src/components/site/**/*.tsx", "src/data/**/*.json", "src/routeTree.gen.ts", "vite.config.ts"],
             "compilerOptions": {
               "target": "ES2022",
               "jsx": "react-jsx",
