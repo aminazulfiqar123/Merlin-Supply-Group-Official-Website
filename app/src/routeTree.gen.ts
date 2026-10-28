@@ -10,31 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as BrandPartnershipsRouteImport } from './routes/brand-partnerships'
 import { Route as B2bWholesaleRouteImport } from './routes/b2b-wholesale'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -67,11 +54,6 @@ const B2bWholesaleRoute = B2bWholesaleRouteImport.update({
   path: '/b2b-wholesale',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -86,44 +68,35 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/app': typeof AppRoute
   '/b2b-wholesale': typeof B2bWholesaleRoute
   '/brand-partnerships': typeof BrandPartnershipsRoute
   '/categories': typeof CategoriesRoute
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/app': typeof AppRoute
   '/b2b-wholesale': typeof B2bWholesaleRoute
   '/brand-partnerships': typeof BrandPartnershipsRoute
   '/categories': typeof CategoriesRoute
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/app': typeof AppRoute
   '/b2b-wholesale': typeof B2bWholesaleRoute
   '/brand-partnerships': typeof BrandPartnershipsRoute
   '/categories': typeof CategoriesRoute
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
@@ -131,58 +104,46 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/app'
     | '/b2b-wholesale'
     | '/brand-partnerships'
     | '/categories'
     | '/compliance'
     | '/contact'
     | '/privacy'
-    | '/robots.txt'
-    | '/sitemap.xml'
     | '/terms'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/app'
     | '/b2b-wholesale'
     | '/brand-partnerships'
     | '/categories'
     | '/compliance'
     | '/contact'
     | '/privacy'
-    | '/robots.txt'
-    | '/sitemap.xml'
     | '/terms'
   id:
     | '__root__'
     | '/'
     | '/about'
-    | '/app'
     | '/b2b-wholesale'
     | '/brand-partnerships'
     | '/categories'
     | '/compliance'
     | '/contact'
     | '/privacy'
-    | '/robots.txt'
-    | '/sitemap.xml'
     | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AppRoute: typeof AppRoute
   B2bWholesaleRoute: typeof B2bWholesaleRoute
   BrandPartnershipsRoute: typeof BrandPartnershipsRoute
   CategoriesRoute: typeof CategoriesRoute
   ComplianceRoute: typeof ComplianceRoute
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
-  RobotsDottxtRoute: typeof RobotsDottxtRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
 }
 
@@ -193,20 +154,6 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -251,13 +198,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof B2bWholesaleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -278,15 +218,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AppRoute: AppRoute,
   B2bWholesaleRoute: B2bWholesaleRoute,
   BrandPartnershipsRoute: BrandPartnershipsRoute,
   CategoriesRoute: CategoriesRoute,
   ComplianceRoute: ComplianceRoute,
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
-  RobotsDottxtRoute: RobotsDottxtRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
@@ -294,11 +231,10 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
+import type { createStart } from '@tanstack/react-start'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
