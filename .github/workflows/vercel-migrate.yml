@@ -186,6 +186,10 @@ jobs:
           start_entry = root / "src/start.ts"
           if start_entry.exists():
               start_entry.unlink()
+          for route_name in ["robots[.]txt.ts", "sitemap[.]xml.ts"]:
+              route_file = root / "src/routes" / route_name
+              if route_file.exists():
+                  route_file.unlink()
           packages = root / "packages"
           if packages.exists():
               shutil.rmtree(packages)
