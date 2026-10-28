@@ -164,10 +164,17 @@ jobs:
               security.write_text(text)
 
           # Keep only code needed by the company website and its routes.
-          keep = {"routes", "components", "data", "styles.css", "svg.d.ts", "app-meta.json", "start.ts"}
+          keep = {"routes", "components", "data", "styles.css", "svg.d.ts", "app-meta.json", "start.ts", "router.tsx", "lib"}
           src = root / "src"
           for child in list(src.iterdir()):
               if child.name not in keep:
+                  if child.is_dir():
+                      shutil.rmtree(child)
+                  else:
+                      child.unlink()
+          lib = src / "lib"
+          for child in list(lib.iterdir()):
+              if child.name != "error-page.ts":
                   if child.is_dir():
                       shutil.rmtree(child)
                   else:
@@ -199,7 +206,7 @@ jobs:
                   p.unlink()
 
           (root / "tsconfig.json").write_text("""{
-            "include": ["src/routes/**/*.ts", "src/routes/**/*.tsx", "src/components/site/**/*.tsx", "src/data/**/*.json", "src/routeTree.gen.ts", "vite.config.ts"],
+            "include": ["src/routes/**/*.ts", "src/routes/**/*.tsx", "src/components/site/**/*.tsx", "src/data/**/*.json", "src/router.tsx", "src/start.ts", "src/routeTree.gen.ts", "vite.config.ts"],
             "compilerOptions": {
               "target": "ES2022",
               "jsx": "react-jsx",
