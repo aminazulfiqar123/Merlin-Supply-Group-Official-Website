@@ -155,6 +155,22 @@ jobs:
           }
           """)
 
+          css_path = root / "src/styles.css"
+          css_text = css_path.read_text()
+          for stale_import in [
+              '@source "../packages/app-landing/src";',
+              '@source "../packages/quanta/src";',
+              '@import "@higgsfield/quanta/tailwind.css";',
+              '@import "./components/composer/composer.css";',
+              '@import "./components/media-card/media-card.css";',
+              '@import "./components/generation-card/generation-card.css";',
+              '@import "./components/setting-trigger/setting-trigger.css";',
+              '@import "./components/prompt-box/prompt-box.css";',
+              '@import "./components/icon-tile/icon-tile.css";',
+          ]:
+              css_text = css_text.replace(stale_import + "\\n", "")
+          css_path.write_text(css_text)
+
           security = root / "src/lib/security-headers.server.ts"
           if security.exists():
               text = security.read_text().replace(
