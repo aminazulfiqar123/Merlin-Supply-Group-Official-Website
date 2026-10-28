@@ -188,11 +188,27 @@ jobs:
               if p.exists():
                   p.unlink()
 
-          tsconfig = json.loads((root / "tsconfig.json").read_text())
-          tsconfig["include"] = ["src/routes/**/*.ts", "src/routes/**/*.tsx", "src/components/site/**/*.tsx", "src/data/**/*.json", "src/start.ts", "vite.config.ts"]
-          tsconfig["compilerOptions"].pop("types", None)
-          tsconfig["compilerOptions"].pop("paths", None)
-          (root / "tsconfig.json").write_text(json.dumps(tsconfig, indent=2) + "\n")
+          (root / "tsconfig.json").write_text("""{
+            "include": ["src/routes/**/*.ts", "src/routes/**/*.tsx", "src/components/site/**/*.tsx", "src/data/**/*.json", "src/start.ts", "vite.config.ts"],
+            "compilerOptions": {
+              "target": "ES2022",
+              "jsx": "react-jsx",
+              "module": "ESNext",
+              "lib": ["ES2022", "DOM", "DOM.Iterable"],
+              "moduleResolution": "Bundler",
+              "allowImportingTsExtensions": true,
+              "verbatimModuleSyntax": false,
+              "noEmit": true,
+              "resolveJsonModule": true,
+              "skipLibCheck": true,
+              "strict": true,
+              "noUnusedLocals": false,
+              "noUnusedParameters": false,
+              "noFallthroughCasesInSwitch": true,
+              "noUncheckedSideEffectImports": true,
+              "paths": {"@/*": ["./src/*"]}
+            }
+          }\n""")
 
           (root / "WEBSITE-PACKAGE-README.md").write_text("""# Merlin Supply Group LLC website
 
