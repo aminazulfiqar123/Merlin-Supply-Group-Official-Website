@@ -21,8 +21,7 @@ jobs:
       - name: Update vulnerable package and rebuild
         run: |
           cd app
-          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.dependencies['@tanstack/react-start']='1.168.60'; fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n')"
-          bun install
+          bun add @tanstack/react-start@latest @tanstack/react-router@latest @tanstack/router-cli@latest
           bun run build
       - name: Commit security update
         run: |
