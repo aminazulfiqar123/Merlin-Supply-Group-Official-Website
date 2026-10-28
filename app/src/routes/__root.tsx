@@ -76,7 +76,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   return (
     <main className="container" style={{ minHeight: "50vh", paddingBlock: "5rem", textAlign: "center" }}>
