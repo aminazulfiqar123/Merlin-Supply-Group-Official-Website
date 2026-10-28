@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="410" height="420" viewBox="0 0 410 420">
+  <g transform="translate(0 0)">
+    <!-- Gold upward arrow -->
+    <path fill="#C69A4A" d="M202 42 139 79 181 79 181 117 202 130Z"/>
+    <path fill="#A97A32" d="M202 42 266 79 224 79 224 117 202 130Z"/>
+    <!-- Rear upper corners -->
+    <path fill="#064E44" d="M102 101 126 87 126 117Z"/>
+    <path fill="#064E44" d="M279 87 303 101 279 117Z"/>
+    <!-- Top isometric surface -->
+    <path fill="#1E7A6D" d="M49 130 126 87 126 116 202 159 279 116 279 87 356 130 202 218Z"/>
+    <!-- Left outer/front face -->
+    <path fill="#126458" d="M49 130 202 218 202 276 101 218 101 336 49 307Z"/>
+    <!-- Right outer/front face -->
+    <path fill="#064E44" d="M202 218 356 130 356 307 304 336 304 218 202 276Z"/>
+    <!-- Lower center left face -->
+    <path fill="#126458" d="M138 284 202 322 202 395 138 358Z"/>
+    <!-- Lower center right face -->
+    <path fill="#064E44" d="M202 322 268 284 268 358 202 395Z"/>
+  </g>
+</svg>

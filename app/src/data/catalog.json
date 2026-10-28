@@ -1,0 +1,55 @@
+{
+  "categories": [
+    {
+      "id": "home-kitchen",
+      "title": "Home, Kitchen & Dining",
+      "description": "Procurement Scope: Cookware, tabletop appliances, prep tools, and sealed food preservation products.",
+      "image": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=85",
+      "volume": "Order quantities and case-pack terms confirmed with supplier",
+      "compliance": "Master carton integrity, drop-test transit durability, scannable UPC verification, and retail packaging condition",
+      "slug": "home-kitchen",
+      "products": "Cookware, tabletop appliances, prep tools, and sealed food preservation products"
+    },
+    {
+      "id": "health-beauty",
+      "title": "Health, Beauty & Personal Care",
+      "description": "Procurement Scope: Skincare, cosmetics, personal wellness products, and grooming items.",
+      "image": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1600&q=85",
+      "volume": "Order quantities and case-pack terms confirmed with supplier",
+      "compliance": "Tamper-evident seal inspection, lot-code legibility, shelf-life documentation, and scannable UPC verification",
+      "slug": "health-beauty",
+      "products": "Skincare, cosmetics, personal wellness products, and grooming items"
+    },
+    {
+      "id": "sports-outdoor",
+      "title": "Sports, Outdoor & Recreation",
+      "description": "Procurement Scope: Fitness accessories, camping equipment, hydration gear, and recreation products.",
+      "image": "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1600&q=85",
+      "volume": "Order quantities and case-pack terms confirmed with supplier",
+      "compliance": "Master carton integrity, parcel drop-test durability, barcode verification, and authorized-channel documentation",
+      "slug": "sports-outdoor",
+      "products": "Fitness accessories, camping equipment, hydration gear, and recreation products"
+    },
+    {
+      "id": "pet-supplies",
+      "title": "Pet Supplies & Care",
+      "description": "Procurement Scope: Pet grooming tools, habitat accessories, feeding systems, and specialty pet products.",
+      "image": "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1600&q=85",
+      "volume": "Order quantities and case-pack terms confirmed with supplier",
+      "compliance": "Seal and packaging inspection, lot/batch traceability where applicable, carton durability, and barcode readability",
+      "slug": "pet-supplies",
+      "products": "Pet grooming tools, habitat accessories, feeding systems, and specialty pet products"
+    },
+    {
+      "id": "tools-hardware",
+      "title": "Tools, Hardware & MRO",
+      "description": "Procurement Scope: Hand tools, fastener sets, workspace equipment, and maintenance supplies.",
+      "image": "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1600&q=85",
+      "volume": "Order quantities and case-pack terms confirmed with supplier",
+      "compliance": "Heavy-carton integrity, pallet build stability, scannable UPC verification, and freight handling condition",
+      "slug": "tools-hardware",
+      "products": "Hand tools, fastener sets, workspace equipment, and maintenance supplies"
+    }
+  ],
+  "products": []
+}
