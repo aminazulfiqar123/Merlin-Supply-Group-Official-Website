@@ -5,11 +5,11 @@ export const Route = createFileRoute("/b2b-wholesale")({
   head: () => ({
     meta: [
       { title: "Wholesale Supplier Onboarding | Merlin Supply Group" },
-      {
-        name: "description",
-        content:
-          "U.S. brands, manufacturers, and distributors can submit wholesale catalogs, line cards, pricing tiers, and onboarding requirements to Merlin Supply Group.",
-      },
+      { name: "description", content: "U.S. brands, manufacturers, and distributors can submit wholesale catalogs, line cards, pricing tiers, and onboarding requirements to Merlin Supply Group." },
+      { property: "og:title", content: "Wholesale Supplier Onboarding | Merlin Supply Group" },
+      { property: "og:description", content: "U.S. brands, manufacturers, and distributors can submit wholesale catalogs, line cards, pricing tiers, and onboarding requirements to Merlin Supply Group." },
+      { name: "twitter:title", content: "Wholesale Supplier Onboarding | Merlin Supply Group" },
+      { name: "twitter:description", content: "U.S. brands, manufacturers, and distributors can submit wholesale catalogs, line cards, pricing tiers, and onboarding requirements to Merlin Supply Group." },
     ],
     links: [{ rel: "canonical", href: "https://merlinsupplygroup.com/b2b-wholesale" }],
   }),
