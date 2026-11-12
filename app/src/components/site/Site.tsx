@@ -26,8 +26,8 @@ export function Header() {
     <div className="utility"><div className="container utility-inner"><div className="utility-contact"><a href="mailto:purchasing@merlinsupplygroup.com"><Mail size={13}/> purchasing@merlinsupplygroup.com</a><a href="tel:+13072203816"><Phone size={13}/> (307) 220-3816</a></div><div className="utility-promise">Vendor Onboarding <i/> Brand Partnerships <i/> Inventory-led Purchasing</div></div></div>
     <div className="container nav-wrap">
       <Link to="/" className="brand" aria-label="Merlin Supply Group home"><span className="brand-mark"><img src="/merlin-emblem.svg?v=seamfix-20261112" alt="" /></span><BrandWordmark /></Link>
-      <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label="Toggle navigation">{open ? <X/> : <Menu/>}</button>
-      <nav className={open ? "main-nav open" : "main-nav"}>{nav.map(item => <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={loc.pathname === item.to ? "nav-link active" : "nav-link"}>{item.label}</Link>)}</nav>
+      <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open} aria-controls="site-main-nav">{open ? <X/> : <Menu/>}</button>
+      <nav id="site-main-nav" className={open ? "main-nav open" : "main-nav"}>{nav.map(item => <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={loc.pathname === item.to ? "nav-link active" : "nav-link"}>{item.label}</Link>)}</nav>
       <Link to="/b2b-wholesale" className="nav-cta">Submit Wholesale Catalog / Line Card <ArrowUpRight size={15}/></Link>
     </div>
   </header>;
