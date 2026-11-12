@@ -47,7 +47,9 @@ jobs:
               fill('message', 'TEST INQUIRY ONLY — IGNORE AS A REAL SUPPLIER LEAD. Automated quality-control test requested by the website owner on November 12, 2026. Please confirm receipt in purchasing@merlinsupplygroup.com.')
               print('FORM_LOADED: true')
               print('FORM_FIELDS_FILLED: true')
-              form.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
+              button = form.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+              driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
+              driver.execute_script("arguments[0].click();", button)
               status = wait.until(lambda d: next((x.text.strip() for x in d.find_elements(By.CSS_SELECTOR, '.form-status') if x.text.strip() and 'Sending your inquiry' not in x.text), None))
               print('WEBSITE_STATUS: ' + status)
               if 'Thank you. Your inquiry has been submitted.' not in status:
