@@ -16,7 +16,7 @@ const nav = [
 /* A single responsive wordmark shared by the website header and footer. */
 const brandSubtitleLetters = [..."SUPPLY GROUP"];
 function BrandWordmark() {
-  return <span className="brand-type"><b>MERLIN</b><small aria-hidden="true">{brandSubtitleLetters.map((letter, index) => <span key={index} className={letter === " " ? "brand-subtitle-space" : undefined}>{letter === " " ? "\u00a0" : letter}</span>)}</small></span>;
+  return <span className="brand-type"><b>MERLIN<sup className="brand-tm" aria-label="trademark">™</sup></b><small aria-hidden="true">{brandSubtitleLetters.map((letter, index) => <span key={index} className={letter === " " ? "brand-subtitle-space" : undefined}>{letter === " " ? "\u00a0" : letter}</span>)}</small></span>;
 }
 
 export function Header() {
