@@ -56,9 +56,12 @@ export function SectionHeading({ eyebrow, title, description, align = "left" }: 
 
 export function InquiryForm({ mode = "brand", preset = "" }: { mode?: "brand" | "contact" | "wholesale"; preset?: string }) {
   const [status, setStatus] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const [category, setCategory] = useState(preset);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (isSending) return;
+    setIsSending(true);
     const form = e.currentTarget;
     const data = new FormData(form);
     const accessKey = "6dcbac39-e318-4eaf-89fd-fb65e5b497ba";
@@ -78,10 +81,11 @@ export function InquiryForm({ mode = "brand", preset = "" }: { mode?: "brand" | 
       if (!response.ok || result.success !== true) throw new Error("Web3Forms did not accept the submission.");
       setStatus("Thank you. Your inquiry has been submitted.");
       form.reset();
-      return;
+      setCategory(preset);
     } catch {
       setStatus("We could not submit this form right now. Please email purchasing@merlinsupplygroup.com.");
-      return;
+    } finally {
+      setIsSending(false);
     }
 
   }
@@ -99,8 +103,8 @@ export function InquiryForm({ mode = "brand", preset = "" }: { mode?: "brand" | 
       <div className="field-grid"><label>Inquiry type<select name="inquiry_type" defaultValue={preset || ""}><option value="">(Select inquiry type)</option><option>New Wholesale Account Opening</option><option>Product Catalog / Line Card Submission</option><option>Authorized Distribution Agreement</option><option>MAP Policy & Channel Governance</option><option>Volume / Closeout Sourcing Opportunity</option><option>General Inquiry</option></select></label></div>
     </>}
     {isWholesale && <div className="field-grid"><label>Opening Order Minimums (MOQ) / Lead Times (optional for non-vendors)<input name="moq_leadtime" placeholder="State your standard order minimums, lead times, and case-pack requirements"/></label><label>MAP Policy Enforcement (optional for non-vendors)<select name="map_policy" defaultValue=""><option value="">(Select MAP status)</option><option>Strictly Enforced MAP</option><option>Informal Pricing Guidelines</option><option>No MAP Policy</option><option>Details Provided Upon Account Review</option></select></label></div>}
-    <label>Message {isWholesale ? "" : "*" }{isWholesale ? <textarea name="message" rows={4} placeholder="Wholesale tiers, case packs, terms, or other supplier details."/> : <textarea name="message" rows={4} required={isContact} placeholder={isContact ? "How can we help? Please share details relevant to your inquiry." : "How can we help? Include relevant product details or links."}/>}</label>
-    <button className="button button-gold form-submit" type="submit">{isWholesale ? "Submit Catalog / Line Card" : isContact ? "Send Message" : "Submit Brand Partnership Inquiry"} <ArrowRight size={16}/></button>
+    <label>Message {isWholesale ? "" : "*" }{isWholesale ? <textarea name="message" rows={4} placeholder="Wholesale tiers, case packs, terms, or other supplier details."/> : <textarea name="message" rows={4} required={!isWholesale} placeholder={isContact ? "How can we help? Please share details relevant to your inquiry." : "How can we help? Include relevant product details or links."}/>}</label>
+    <button className="button button-gold form-submit" type="submit" disabled={isSending} aria-busy={isSending}>{isWholesale ? "Submit Catalog / Line Card" : isContact ? "Send Message" : "Submit Brand Partnership Inquiry"} <ArrowRight size={16}/></button>
     {status && <p className="form-status" role="status">{status}</p>}
     <p className="form-note">Please do not submit confidential tax, identity, or financial documents through this form.</p>
   </form>;
