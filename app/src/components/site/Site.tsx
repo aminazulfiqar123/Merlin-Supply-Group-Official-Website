@@ -12,13 +12,20 @@ const nav = [
   { label: "Contact Us", to: "/contact" },
 ];
 
+
+/* A single responsive wordmark shared by the website header and footer. */
+const brandSubtitleLetters = [..."SUPPLY GROUP"];
+function BrandWordmark() {
+  return <span className="brand-type"><b>MERLIN</b><small aria-hidden="true">{brandSubtitleLetters.map((letter, index) => <span key={index} className={letter === " " ? "brand-subtitle-space" : undefined}>{letter === " " ? "\u00a0" : letter}</span>)}</small></span>;
+}
+
 export function Header() {
   const loc = useLocation();
   const [open, setOpen] = useState(false);
   return <header className="site-header">
     <div className="utility"><div className="container utility-inner"><div className="utility-contact"><a href="mailto:purchasing@merlinsupplygroup.com"><Mail size={13}/> purchasing@merlinsupplygroup.com</a><a href="tel:+13072203816"><Phone size={13}/> (307) 220-3816</a></div><div className="utility-promise">Vendor Onboarding <i/> Brand Partnerships <i/> Inventory-led Purchasing</div></div></div>
     <div className="container nav-wrap">
-      <Link to="/" className="brand" aria-label="Merlin Supply Group home"><span className="brand-mark"><img src="/merlin-emblem.svg?v=seamfix-20261112" alt="" /></span><span className="brand-type"><b>MERLIN</b><small>SUPPLY GROUP</small></span></Link>
+      <Link to="/" className="brand" aria-label="Merlin Supply Group home"><span className="brand-mark"><img src="/merlin-emblem.svg?v=seamfix-20261112" alt="" /></span><BrandWordmark /></Link>
       <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label="Toggle navigation">{open ? <X/> : <Menu/>}</button>
       <nav className={open ? "main-nav open" : "main-nav"}>{nav.map(item => <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={loc.pathname === item.to ? "nav-link active" : "nav-link"}>{item.label}</Link>)}</nav>
       <Link to="/b2b-wholesale" className="nav-cta">Submit Wholesale Catalog / Line Card <ArrowUpRight size={15}/></Link>
@@ -28,7 +35,7 @@ export function Header() {
 
 export function Footer() {
   return <footer className="footer"><div className="container footer-grid">
-    <div><Link to="/" className="brand brand-inverse"><span className="brand-mark"><img src="/merlin-emblem.svg?v=seamfix-20261112" alt="" /></span><span className="brand-type"><b>MERLIN</b><small>SUPPLY GROUP</small></span></Link><p className="footer-legal">Merlin Supply Group LLC<br/>A Wyoming Limited Liability Company<br/>30 N Gould St, Ste R, Sheridan, WY 82801<br/><br/>Nationwide freight receiving, palletized cross-dock, and 3PL fulfillment coordinated via contracted commercial logistics hubs across the continental United States.<br/><br/>Wyoming resale certificate and Federal EIN provided upon trade account setup.</p></div>
+    <div><Link to="/" className="brand brand-inverse"><span className="brand-mark"><img src="/merlin-emblem.svg?v=seamfix-20261112" alt="" /></span><BrandWordmark /></Link><p className="footer-legal">Merlin Supply Group LLC<br/>A Wyoming Limited Liability Company<br/>30 N Gould St, Ste R, Sheridan, WY 82801<br/><br/>Nationwide freight receiving, palletized cross-dock, and 3PL fulfillment coordinated via contracted commercial logistics hubs across the continental United States.<br/><br/>Wyoming resale certificate and Federal EIN provided upon trade account setup.</p></div>
     <div><h4>Business Address</h4><p>30 N Gould St, Ste R<br/>Sheridan, WY 82801</p><p className="footer-muted">Nationwide freight receiving, palletized cross-dock, and 3PL fulfillment coordinated via contracted commercial logistics hubs across the continental United States.</p></div>
     <div><h4>Company</h4><Link to="/about">About Us</Link><Link to="/categories">Core Categories</Link><Link to="/b2b-wholesale">Supplier Onboarding</Link><Link to="/brand-partnerships">Brand Partnerships</Link></div>
     <div><h4>Policies & Contact</h4><Link to="/shipping-policy">Shipping Policy</Link><Link to="/refund-policy">Refund &amp; Returns Policy</Link><Link to="/privacy">Privacy Policy</Link><Link to="/terms">Terms of Distribution</Link><Link to="/compliance">Authorized Reseller Statement</Link><a href="mailto:purchasing@merlinsupplygroup.com">Purchasing email</a><a href="tel:+13072203816">(307) 220-3816</a></div>
