@@ -1,0 +1,88 @@
+name: One-time public site mobile and navigation QA
+on:
+  push:
+    branches: [qa-mobile-credibility-20261112]
+    paths: [.github/workflows/qa-mobile-credibility-once.yml]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - name: Check live mobile layouts navigation and internal pages
+        run: |
+          python3 -m pip install --user --disable-pip-version-check -q selenium
+          python3 - <<'PY'
+          import json, time, urllib.request, urllib.error, sys
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+          from selenium.webdriver.support import expected_conditions as EC
+          BASE='https://merlinsupplygroup.com'
+          PAGES=['/','/about','/categories','/b2b-wholesale','/brand-partnerships','/contact','/privacy','/terms','/compliance','/shipping-policy','/refund-policy']
+          opt=Options()
+          opt.add_argument('--headless=new')
+          opt.add_argument('--no-sandbox')
+          opt.add_argument('--disable-dev-shm-usage')
+          opt.add_argument('--window-size=1440,900')
+          opt.page_load_strategy='eager'
+          d=webdriver.Chrome(options=opt)
+          d.set_page_load_timeout(35)
+          results=[]
+          errors=[]
+          try:
+              for width in [360,390,768,1440]:
+                  selected=PAGES if width==390 else ['/', '/b2b-wholesale','/brand-partnerships','/contact']
+                  d.execute_cdp_cmd('Emulation.setDeviceMetricsOverride',{'width':width,'height':900,'deviceScaleFactor':1,'mobile':width<768})
+                  for path in selected:
+                      try:
+                          d.get(BASE+path)
+                          WebDriverWait(d,12).until(lambda w: len(w.find_elements(By.CSS_SELECTOR,'header.site-header'))>0)
+                          time.sleep(.25)
+                          facts=d.execute_script('''
+                            const h=document.documentElement, w=window.innerWidth;
+                            const hero=document.querySelector('.hero, .page-intro');
+                            const head=document.querySelector('header.site-header');
+                            const logo=document.querySelector('.site-header .brand');
+                            const mainNav=document.querySelector('.main-nav');
+                            const ctas=[...document.querySelectorAll('.hero-actions .button')];
+                            const off=[...document.body.querySelectorAll('*')].filter(e=>{const r=e.getBoundingClientRect(),st=getComputedStyle(e);return st.display!=='none' && st.visibility!=='hidden' && r.width>0 && r.right>w+6 && !e.closest('.main-nav')}).slice(0,5).map(e=>({tag:e.tagName,cls:String(e.className).slice(0,70),right:Math.round(e.getBoundingClientRect().right)}));
+                            return {viewport:w,docWidth:h.scrollWidth,logoWidth:logo?.getBoundingClientRect().width,navVisible:mainNav?getComputedStyle(mainNav).display:'n/a',navHeaderHeight:head?.getBoundingClientRect().height,heroButtons:ctas.map(e=>({name:e.textContent.trim().slice(0,42),visible:e.getBoundingClientRect().bottom <= (hero?.getBoundingClientRect().bottom||0)+1})),offenders:off,forms:document.querySelectorAll('form.inquiry-form').length,brokenImages:[...document.images].filter(im=>im.complete && !im.naturalWidth).slice(0,4).map(im=>im.currentSrc.slice(0,85))};
+                          ''')
+                          result={'path':path,'width':width,'title':d.title,**facts}
+                          if facts['docWidth']>facts['viewport']+5: errors.append('HORIZONTAL_OVERFLOW '+str(width)+' '+path+' '+str(facts['docWidth'])+'>'+str(facts['viewport'])+' '+str(facts['offenders']))
+                          if any(not q['visible'] for q in facts['heroButtons']): errors.append('HERO_BUTTON_CLIPPED '+str(width)+' '+path+' '+str(facts['heroButtons']))
+                          results.append(result)
+                          print('PAGE '+json.dumps(result))
+                      except Exception as e:
+                          errors.append('PAGE_ERROR '+str(width)+' '+path+' '+str(e).splitlines()[0][:180])
+              d.execute_cdp_cmd('Emulation.setDeviceMetricsOverride',{'width':390,'height':844,'deviceScaleFactor':1,'mobile':True})
+              d.get(BASE+'/')
+              button=WebDriverWait(d,12).until(EC.presence_of_element_located((By.CSS_SELECTOR,'.mobile-menu')))
+              button.click()
+              visible=d.execute_script("return getComputedStyle(document.querySelector('.main-nav')).display")
+              print('MOBILE_MENU_OPEN_DISPLAY '+str(visible))
+              if visible=='none':errors.append('MOBILE_MENU_NOT_OPENING')
+              navs=d.find_elements(By.CSS_SELECTOR,'.main-nav a')
+              print('MOBILE_MENU_LINKS '+str([(n.text.strip(),n.get_attribute('href')) for n in navs]))
+              print('MOBILE_MENU_ARIA_EXPANDED '+str(button.get_attribute('aria-expanded')))
+              all_hrefs=d.execute_script("return [...document.querySelectorAll('a[href]')].map(a=>a.getAttribute('href'))")
+              bad=[href for href in all_hrefs if href in ('#','',None,'javascript:void(0)')]
+              if bad: errors.append('NONFUNCTIONAL_HREF '+str(bad[:8]))
+              for path in PAGES+['/robots.txt','/sitemap.xml']:
+                  try:
+                      req=urllib.request.Request(BASE+path,headers={'User-Agent':'Merlin-QA-Single-Check/1.0'})
+                      with urllib.request.urlopen(req,timeout=18) as resp:
+                          status=resp.status
+                      print('HTTP '+path+' '+str(status))
+                      if status>=400:errors.append('HTTP_ERROR '+path+' '+str(status))
+                  except Exception as e:
+                      errors.append('HTTP_EXCEPTION '+path+' '+str(e).splitlines()[0][:140])
+              print('ISSUES_JSON '+json.dumps(errors))
+              print('CHECKED_PAGE_VIEWPORT_COMBINATIONS '+str(len(results)))
+              if errors:sys.exit(1)
+          finally:
+              d.quit()
+          PY
