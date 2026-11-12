@@ -47,11 +47,36 @@ jobs:
               fill('message', 'TEST INQUIRY ONLY — IGNORE AS A REAL SUPPLIER LEAD. Automated quality-control test requested by the website owner on November 12, 2026. Please confirm receipt in purchasing@merlinsupplygroup.com.')
               print('FORM_LOADED: true')
               print('FORM_FIELDS_FILLED: true')
+              driver.execute_script("""
+                  window.__qaNetwork = {state: 'no request detected'};
+                  const originalFetch = window.fetch;
+                  window.fetch = async function(...args) {
+                    const target = String(args[0]);
+                    try {
+                      const response = await originalFetch.apply(this, args);
+                      if (target.includes('api.web3forms.com/submit')) {
+                        let msg = '';
+                        try {
+                          const data = await response.clone().json();
+                          msg = String(data.message || data.body?.message || data.error || '').slice(0, 350);
+                        } catch (err) { msg = 'non-JSON provider response'; }
+                        window.__qaNetwork = {httpStatus: response.status, message: msg};
+                      }
+                      return response;
+                    } catch (error) {
+                      if (target.includes('api.web3forms.com/submit')) {
+                        window.__qaNetwork = {networkError: String(error).slice(0, 250)};
+                      }
+                      throw error;
+                    }
+                  };
+              """)
               button = form.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
               driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
               driver.execute_script("arguments[0].click();", button)
               status = wait.until(lambda d: next((x.text.strip() for x in d.find_elements(By.CSS_SELECTOR, '.form-status') if x.text.strip() and 'Sending your inquiry' not in x.text), None))
               print('WEBSITE_STATUS: ' + status)
+              print('FORM_PROVIDER_DIAGNOSTIC: ' + str(driver.execute_script('return window.__qaNetwork;')))
               if 'Thank you. Your inquiry has been submitted.' not in status:
                   print('RESULT: NOT_ACCEPTED')
                   sys.exit(1)
