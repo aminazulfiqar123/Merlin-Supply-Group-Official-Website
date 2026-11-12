@@ -1,0 +1,65 @@
+name: One-time supplier inquiry QA
+on:
+  push:
+    branches:
+      - qa-inquiry-test-20261112
+    paths:
+      - .github/workflows/qa-inquiry-once.yml
+permissions:
+  contents: read
+jobs:
+  sample-inquiry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - name: Send one clearly labeled test via live supplier onboarding form
+        run: |
+          python3 -m pip install --user --disable-pip-version-check -q selenium
+          python3 - <<'PY'
+          import sys
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait, Select
+          from selenium.webdriver.support import expected_conditions as EC
+          opts = Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1365,900')
+          driver = webdriver.Chrome(options=opts)
+          try:
+              driver.set_page_load_timeout(40)
+              driver.get('https://merlinsupplygroup.com/b2b-wholesale')
+              wait = WebDriverWait(driver, 45)
+              form = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'form.inquiry-form')))
+              def fill(name, value):
+                  field = form.find_element(By.CSS_SELECTOR, '[name="' + name + '"]')
+                  field.clear()
+                  field.send_keys(value)
+              fill('company', 'Merlin Supply Group — QA TEST, NOT A SUPPLIER')
+              fill('contact', 'Website QA Sample Test')
+              fill('catalog', 'Will email direct — QA TEST ONLY')
+              select = Select(form.find_element(By.CSS_SELECTOR, 'select[name="category"]'))
+              select.select_by_index(1)
+              fill('email', 'website-qa@example.com')
+              fill('phone', '+1 202-555-0142')
+              fill('message', 'TEST INQUIRY ONLY — IGNORE AS A REAL SUPPLIER LEAD. Automated quality-control test requested by the website owner on November 12, 2026. Please confirm receipt in purchasing@merlinsupplygroup.com.')
+              print('FORM_LOADED: true')
+              print('FORM_FIELDS_FILLED: true')
+              form.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
+              status = wait.until(lambda d: next((x.text.strip() for x in d.find_elements(By.CSS_SELECTOR, '.form-status') if x.text.strip() and 'Sending your inquiry' not in x.text), None))
+              print('WEBSITE_STATUS: ' + status)
+              if 'Thank you. Your inquiry has been submitted.' not in status:
+                  print('RESULT: NOT_ACCEPTED')
+                  sys.exit(1)
+              print('RESULT: ACCEPTED_BY_FORM_PROVIDER')
+              print('IMPORTANT: Inbox receipt remains unverified.')
+          except Exception as e:
+              print('RESULT: TEST_ERROR')
+              print('ERROR_TYPE: ' + type(e).__name__)
+              print('ERROR_SUMMARY: ' + str(e).splitlines()[0][:240])
+              raise
+          finally:
+              driver.quit()
+          PY
